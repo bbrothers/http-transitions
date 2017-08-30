@@ -7,61 +7,60 @@
 [![Quality Score][ico-code-quality]][link-code-quality]
 [![Total Downloads][ico-downloads]][link-downloads]
 
-**Note:** Replace ```Brad Brothers``` ```bbrothers``` ```https://github.com/bbrothers``` ```brad@bradbrothers.ca``` ```bbrothers``` ```http-transitions``` ```API Version Transitioning``` with their correct values in [README.md](README.md), [CHANGELOG.md](CHANGELOG.md), [CONTRIBUTING.md](CONTRIBUTING.md), [LICENSE.md](LICENSE.md) and [composer.json](composer.json) files, then delete this line. You can run `$ php prefill.php` in the command line to make all replacements at once. Delete the file prefill.php as well.
+A package for transitioning HTTP requests and responses based on a version header.  
 
-This is where your description should go. Try and limit it to a paragraph or two, and maybe throw in a mention of what
-PSRs you support to avoid any confusion with users and contributors.
+Release updates to your API schema without breaking existing clients by creating `Transition` classes that transition the request and/or response to match the previously expected result. Each layer of transitions only needs to convert the current version to match the previous version, from there the request and response will be piped through the subsequent layers until they match the version requested in the `Api-Version` header.
 
-## Structure
-
-If any of the following are applicable to your project, then the directory structure should follow industry best practises by being named the following.
-
-```
-bin/        
-config/
-src/
-tests/
-vendor/
-```
-
+Largely based on [Stripe's API versioning](https://stripe.com/blog/api-versioning) article.
 
 ## Install
-
-Via Composer
 
 ``` bash
 $ composer require bbrothers/http-transitions
 ```
+#### Middleware
+
+In your `app/Http/Kernel.php` file, add:
+```php
+protected $middleware = [
+    Transitions\TransitionMiddleware::class
+];
+```
+
+#### Service Provider
+
+For Laravel 5.4, in your `config/app.php` file, in the `providers` array, add:
+```php
+Transitions\TransitionProvider::class
+```
+
+#### Publish Config
+```bash
+php artisan vendor:publish --provider="Transitions\TransitionProvider"
+```
 
 ## Usage
+Add version numbers and an array of `Transition` classes to the `transitions.php` file.
 
 ``` php
-$skeleton = new Transitions();
-echo $skeleton->echoPhrase('Hello, League!');
+return [
+   'headerKey' => 'Api-Version',
+   'transitions'    => [
+       '20160101' => [
+           FullNameToNameTransition::class,
+           NameToFirstNameLastNameTransition::class,
+           BirthDateTransition::class,
+       ],
+       '20150101' => [
+           FirstNameLastNameToFullNameTransition::class,
+       ],
+   ],
+]
 ```
 
 ## Change log
 
 Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed recently.
-
-## Testing
-
-``` bash
-$ composer test
-```
-
-## Contributing
-
-Please see [CONTRIBUTING](CONTRIBUTING.md) and [CONDUCT](CONDUCT.md) for details.
-
-## Security
-
-If you discover any security related issues, please email brad@bradbrothers.ca instead of using the issue tracker.
-
-## Credits
-
-- [Brad Brothers][link-author]
-- [All Contributors][link-contributors]
 
 ## License
 
