@@ -10,6 +10,15 @@ use Illuminate\Support\ServiceProvider;
  */
 class TransitionProvider extends ServiceProvider
 {
+
+    public function boot()
+    {
+
+        $this->publishes([
+            __DIR__ . '/../config/config.php' => config_path('transitions.php'),
+        ]);
+    }
+
     /**
      * Register the application services.
      */
