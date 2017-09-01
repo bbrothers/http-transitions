@@ -1,8 +1,9 @@
 <?php
 
-namespace Transitions;
+namespace Transitions\Transitions;
 
 use Illuminate\Http\Request;
+use Transitions\Transition;
 
 /**
  * Class FullNameToNameTransition

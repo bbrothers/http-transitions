@@ -38,12 +38,12 @@ abstract class TestCase extends Orchestra
             'headerKey'   => 'Api-Version',
             'transitions' => [
                 '20160101' => [
-                    FullNameToNameTransition::class,
-                    NameToFirstNameLastNameTransition::class,
-                    BirthDateTransition::class,
+                    Transitions\FullNameToNameTransition::class,
+                    Transitions\NameToFirstNameLastNameTransition::class,
+                    Transitions\BirthDateTransition::class,
                 ],
                 '20150101' => [
-                    FirstNameLastNameToFullNameTransition::class,
+                    Transitions\FirstNameLastNameToFullNameTransition::class,
                 ],
             ],
         ]);

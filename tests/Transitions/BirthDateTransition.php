@@ -1,9 +1,10 @@
 <?php
 
-namespace Transitions;
+namespace Transitions\Transitions;
 
 use DateTime;
 use Symfony\Component\HttpFoundation\Response;
+use Transitions\Transition;
 
 /**
  * Class BirthDateTransition
