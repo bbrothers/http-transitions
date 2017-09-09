@@ -19,9 +19,7 @@ class NameToFirstNameLastNameTransition extends Transition
     public function transformResponse(Response $response) : Response
     {
         $content = json_decode($response->getContent(), true);
-        $content['first_name'] = $content['name']['first_name'];
-        $content['last_name'] = $content['name']['last_name'];
-        unset($content['name']);
+        $content = array_diff_key(array_merge($content, $content['name']), ['name' => true]);
 
         return $response->setContent(json_encode($content));
     }
