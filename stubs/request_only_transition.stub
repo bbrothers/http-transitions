@@ -1,0 +1,23 @@
+<?php
+
+namespace DummyNamespace;
+
+use Illuminate\Http\Request;
+use Transitions\Transition;
+
+/**
+ * Class DummyClass
+ */
+class DummyClass extends Transition
+{
+
+    /**
+     * @param Request $request
+     * @return Request
+     */
+    public function transformRequest(Request $request) : Request
+    {
+
+        return $request;
+    }
+}

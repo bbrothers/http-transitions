@@ -72,6 +72,12 @@ class NameToFirstNameLastNameTransition extends Transition
 }
 ```
 
+## Transition Generators
+```bash
+$ php artisan make:transition NameToFirstNameLastNameTransition
+```
+Optionally, the `--request-only` or `--response-only` flags can be added to create a transform that only generates a `transformRequest` or `transformResponse` method respectively.
+
 ## Change log
 
 Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed recently.
