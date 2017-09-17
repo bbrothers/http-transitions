@@ -13,10 +13,11 @@ class TransitionProvider extends ServiceProvider
 
     public function boot()
     {
-
-        $this->publishes([
-            __DIR__ . '/../config/config.php' => config_path('transitions.php'),
-        ]);
+        if ($this->app->runningInConsole()) {
+            $this->publishes([
+                __DIR__ . '/../config/config.php' => config_path('transitions.php'),
+            ]);
+        }
     }
 
     /**
@@ -28,7 +29,7 @@ class TransitionProvider extends ServiceProvider
 
         $this->app->bind(TransitionMiddleware::class, function ($app) {
             $config = new Config($app['config']->get('transitions'));
-            return new TransitionMiddleware($config, $app);
+            return new TransitionMiddleware($config, new TransitionFactory($app));
         });
     }
 }
