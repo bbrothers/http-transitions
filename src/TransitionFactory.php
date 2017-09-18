@@ -37,9 +37,9 @@ class TransitionFactory
     public function create(string $transition) : Transition
     {
 
-        if (! isset(static::$transitions[$transition])) {
-            static::$transitions[$transition] = $this->container->make($transition);
+        if (! isset(self::$transitions[$transition])) {
+            self::$transitions[$transition] = $this->container->make($transition);
         }
-        return static::$transitions[$transition];
+        return self::$transitions[$transition];
     }
 }

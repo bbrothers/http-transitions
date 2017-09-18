@@ -83,7 +83,7 @@ class TransitionMiddleware
     {
 
         /** @var Transition $transition */
-        foreach ($this->config->transitionsForRequest($version) as $transition) {
+        foreach ($this->config->transitionsForVersion($version) as $transition) {
             yield $this->factory->create($transition);
         }
     }
