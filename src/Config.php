@@ -61,12 +61,10 @@ class Config
     {
 
         if (! isset($attributes['headerKey'])) {
-            throw new LogicException(
-                'A header key must be set in the transitions.php ' .
-                'config file to identify a request version.'
-            );
+            throw HeaderKeyNotDefined::new();
         }
         $this->headerKey = $attributes['headerKey'];
+
         return $this;
     }
 
