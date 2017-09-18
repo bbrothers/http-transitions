@@ -3,6 +3,7 @@
 namespace Transitions;
 
 use Illuminate\Support\ServiceProvider;
+use Transitions\Console\GenerateTransition;
 
 /**
  * Class TransitionProvider
@@ -31,5 +32,7 @@ class TransitionProvider extends ServiceProvider
             $config = new Config($app['config']->get('transitions'));
             return new TransitionMiddleware($config, new TransitionFactory($app));
         });
+
+        $this->commands([GenerateTransition::class]);
     }
 }
