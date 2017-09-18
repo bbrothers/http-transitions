@@ -2,8 +2,7 @@
 
 namespace Transitions;
 
-use Illuminate\Support\Collection;
-use LogicException;
+use Generator;
 
 class Config
 {
@@ -13,6 +12,7 @@ class Config
      * @var string
      */
     protected $headerKey;
+
     /**
      * An array of transitions to apply, keyed by version date.
      * @var array
@@ -40,17 +40,34 @@ class Config
     }
 
     /**
+     * Get the applicable transitions for the given version.
+     *
      * @param string|int $version
-     * @return Collection
+     * @return array
      */
-    public function transitionsForRequest($version)
+    public function transitionsForVersion($version) : array
     {
 
-        return Collection::make($this->transitions)
-                         ->filter(function ($_, $key) use ($version) {
+        $applicable = [];
+        foreach ($this->filterStages($version) as $key => $classes) {
+            $applicable = array_merge($applicable, $classes);
+        }
 
-                             return $version <= $key;
-                         })->flatten();
+        return $applicable;
+    }
+
+    /**
+     * @param string|int $version
+     * @return Generator
+     */
+    private function filterStages($version) : Generator
+    {
+
+        foreach ($this->transitions as $key => $class) {
+            if ($version <= $key) {
+                yield $key => $class;
+            }
+        }
     }
 
     /**
@@ -61,12 +78,10 @@ class Config
     {
 
         if (! isset($attributes['headerKey'])) {
-            throw new LogicException(
-                'A header key must be set in the transitions.php ' .
-                'config file to identify a request version.'
-            );
+            throw HeaderKeyNotDefined::new();
         }
         $this->headerKey = $attributes['headerKey'];
+
         return $this;
     }
 

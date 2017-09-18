@@ -3,7 +3,6 @@
 namespace Transitions;
 
 use Closure;
-use Illuminate\Contracts\Container\Container;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -14,25 +13,27 @@ use Symfony\Component\HttpFoundation\Response;
 class TransitionMiddleware
 {
 
+    protected static $transitions = [];
+
     /**
      * @var Config
      */
     private $config;
     /**
-     * @var Container
+     * @var TransitionFactory
      */
-    private $container;
+    private $factory;
 
     /**
      * TransitionMiddleware constructor.
-     * @param Config    $config
-     * @param Container $container
+     * @param Config            $config
+     * @param TransitionFactory $factory
      */
-    public function __construct(Config $config, Container $container)
+    public function __construct(Config $config, TransitionFactory $factory)
     {
 
         $this->config = $config;
-        $this->container = $container;
+        $this->factory = $factory;
     }
 
     /**
@@ -82,8 +83,8 @@ class TransitionMiddleware
     {
 
         /** @var Transition $transition */
-        foreach ($this->config->transitionsForRequest($version) as $transition) {
-            yield $this->container->make($transition);
+        foreach ($this->config->transitionsForVersion($version) as $transition) {
+            yield $this->factory->create($transition);
         }
     }
 }
