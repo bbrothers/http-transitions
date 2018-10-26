@@ -60,7 +60,7 @@ class Config
 
         return array_filter($this->transitions, function ($key) use ($version) {
 
-            return $version <= $key;
+            return $version <= $key or $key === '*';
         }, ARRAY_FILTER_USE_KEY);
     }
 

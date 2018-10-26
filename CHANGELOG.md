@@ -9,6 +9,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 ### Added
 - extracted `TransitionFactory` interface
 - updated Laravel service provider to use `LaravelTransitionFactory`
+- added wildcard (`*`) option for applying transitions
 
 ### Deprecated
 - Nothing

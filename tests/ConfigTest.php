@@ -46,4 +46,21 @@ class ConfigTest extends TestCase
             '2017-transitions',
         ], $config->transitionsForVersion(2016));
     }
+
+    /** @test */
+    public function itWillAlwaysIncludeTransitionsWithAWildCard() : void
+    {
+
+        $config = Config::fromArray([
+            'headerKey' => 'Api-Version',
+            'transitions' => [
+                '*' => ['wildcard-transitions'],
+                '2017' => ['2017-transitions'],
+            ],
+        ]);
+
+        $this->assertEquals([
+            'wildcard-transitions',
+        ], $config->transitionsForVersion(2018));
+    }
 }
