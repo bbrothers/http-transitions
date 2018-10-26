@@ -2,18 +2,16 @@
 
 namespace Transitions;
 
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
 use Transitions\Console\GenerateTransition;
 
-/**
- * Class TransitionProvider
- * @package Transitions
- */
 class TransitionProvider extends ServiceProvider
 {
 
-    public function boot()
+    public function boot() : void
     {
+
         if ($this->app->runningInConsole()) {
             $this->publishes([
                 __DIR__ . '/../config/config.php' => config_path('transitions.php'),
@@ -21,16 +19,20 @@ class TransitionProvider extends ServiceProvider
         }
     }
 
-    /**
-     * Register the application services.
-     */
-    public function register()
+    public function register() : void
     {
+
         $this->mergeConfigFrom(__DIR__ . '/../config/config.php', 'transitions');
 
-        $this->app->bind(TransitionMiddleware::class, function ($app) {
-            $config = new Config($app['config']->get('transitions'));
-            return new TransitionMiddleware($config, new TransitionFactory($app));
+        $this->app->bind(TransitionFactory::class, function (Application $app) {
+
+            return new LaravelTransitionFactory($app);
+        });
+
+        $this->app->bind(TransitionMiddleware::class, function (Application $app) {
+
+            $config = Config::fromArray($app->make('config')->get('transitions'));
+            return new TransitionMiddleware($config, $app->make(TransitionFactory::class));
         });
 
         $this->commands([GenerateTransition::class]);

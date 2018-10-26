@@ -11,8 +11,10 @@ class HeaderKeyNotDefined extends LogicException
     {
 
         return new static(
-            'A header key must be set in the transitions.php ' .
-            'config file to identify a request version.'
+            'A header key must be set in the transitions.php config file array ' .
+            'under the `headerKey` key, to identify a request version.' . PHP_EOL .
+            'see https://github.com/bbrothers/http-transitions#usage for details.' . PHP_EOL .
+            "Example: `['headerKey' => 'Api-Version']"
         );
     }
 }
