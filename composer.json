@@ -13,14 +13,15 @@
     "license" : "MIT",
     "require" : {
         "php" : "^7.1",
-        "illuminate/config" : "5.4.*|5.5.*|5.6.*",
-        "illuminate/contracts" : "5.4.*|5.5.*|5.6.*",
-        "illuminate/http" : "5.4.*|5.5.*|5.6.*",
-        "illuminate/support" : "5.4.*|5.5.*|5.6.*"
+        "ext-json": "*",
+        "illuminate/config" : "5.5.*|5.6.*|5.7.*",
+        "illuminate/contracts" : "5.5.*|5.6.*|5.7.*",
+        "illuminate/http" : "5.5.*|5.6.*|5.7.*",
+        "illuminate/support" : "5.5.*|5.6.*|5.7.*"
     },
     "require-dev" : {
         "phpunit/phpunit" : "^7.0",
-        "orchestra/testbench" : "~3.6",
+        "orchestra/testbench" : "~3.7",
         "squizlabs/php_codesniffer": "^2.3"
     },
     "autoload" : {

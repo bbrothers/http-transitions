@@ -16,6 +16,7 @@ class GenerateTransitionTest extends TestCase
 
         parent::setUp();
         $this->files = $this->app->make(Filesystem::class);
+        $this->withoutMockingConsoleOutput();
     }
 
     /** @test */
