@@ -5,10 +5,6 @@ namespace Transitions;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * Class Transition
- * @package Transitions
- */
 abstract class Transition
 {
 
@@ -17,28 +13,21 @@ abstract class Transition
      */
     protected $request;
 
-    /**
-     * @param Request $request
-     * @return Request
-     */
     public function transformRequest(Request $request) : Request
     {
 
         return $request;
     }
 
-    /**
-     * @param Response $response
-     * @return Response
-     */
     public function transformResponse(Response $response) : Response
     {
 
         return $response;
     }
 
-    public function withRequest($request)
+    public function withRequest($request) : Transition
     {
+
         $this->request = $request;
         return $this;
     }

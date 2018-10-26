@@ -2,8 +2,6 @@
 
 namespace Transitions;
 
-use Generator;
-
 class Config
 {
 
@@ -19,21 +17,20 @@ class Config
      */
     protected $transitions;
 
-    /**
-     * Config constructor.
-     * @param array $attributes
-     */
-    public function __construct(array $attributes)
+    public function __construct(string $headerKey = '', array $transitions = [])
     {
 
-        $this->setHeaderKey($attributes)
-             ->setTransitions($attributes);
+        $this->setHeaderKey($headerKey)
+             ->setTransitions($transitions);
     }
 
-    /**
-     * @return string
-     */
-    public function headerKey()
+    public static function fromArray(array $attributes) : Config
+    {
+
+        return new static($attributes['headerKey'] ?? '', $attributes['transitions'] ?? []);
+    }
+
+    public function headerKey() : string
     {
 
         return $this->headerKey;
@@ -43,56 +40,45 @@ class Config
      * Get the applicable transitions for the given version.
      *
      * @param string|int $version
-     * @return array
+     * @return array|Transition[]
      */
     public function transitionsForVersion($version) : array
     {
 
-        $applicable = [];
-        foreach ($this->filterStages($version) as $key => $classes) {
-            $applicable = array_merge($applicable, $classes);
-        }
+        return array_reduce($this->filterStages($version), function (array $applicable, array $classes) {
 
-        return $applicable;
+            return array_merge($applicable, $classes);
+        }, []);
     }
 
     /**
      * @param string|int $version
-     * @return Generator
+     * @return array
      */
-    private function filterStages($version) : Generator
+    private function filterStages($version) : array
     {
 
-        foreach ($this->transitions as $key => $class) {
-            if ($version <= $key) {
-                yield $key => $class;
-            }
-        }
+        return array_filter($this->transitions, function ($key) use ($version) {
+
+            return $version <= $key;
+        }, ARRAY_FILTER_USE_KEY);
     }
 
-    /**
-     * @param array $attributes
-     * @return Config
-     */
-    public function setHeaderKey(array $attributes) : Config
+    public function setHeaderKey(string $headerKey = '') : Config
     {
 
-        if (! isset($attributes['headerKey'])) {
+        if (empty($headerKey)) {
             throw HeaderKeyNotDefined::new();
         }
-        $this->headerKey = $attributes['headerKey'];
+        $this->headerKey = $headerKey;
 
         return $this;
     }
 
-    /**
-     * @param array $attributes
-     * @return Config
-     */
-    public function setTransitions(array $attributes) : Config
+    public function setTransitions(array $transitions = []) : Config
     {
 
-        $this->transitions = (array) $attributes['transitions'] ?? [];
+        $this->transitions = $transitions;
         return $this;
     }
 }

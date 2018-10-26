@@ -5,19 +5,12 @@ namespace Transitions\Transitions;
 use Illuminate\Http\Request;
 use Transitions\Transition;
 
-/**
- * Class FullNameToNameTransition
- * @package Transitions
- */
 class FullNameToNameTransition extends Transition
 {
 
-    /**
-     * @param Request $request
-     * @return Request
-     */
     public function transformRequest(Request $request) : Request
     {
+
         if (! $request->request->has('full_name')) {
             return $request;
         }

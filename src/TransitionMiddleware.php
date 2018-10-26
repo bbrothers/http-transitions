@@ -3,17 +3,12 @@
 namespace Transitions;
 
 use Closure;
+use Generator;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * Class TransitionMiddleware
- * @package Transitions
- */
 class TransitionMiddleware
 {
-
-    protected static $transitions = [];
 
     /**
      * @var Config
@@ -24,11 +19,6 @@ class TransitionMiddleware
      */
     private $factory;
 
-    /**
-     * TransitionMiddleware constructor.
-     * @param Config            $config
-     * @param TransitionFactory $factory
-     */
     public function __construct(Config $config, TransitionFactory $factory)
     {
 
@@ -36,11 +26,6 @@ class TransitionMiddleware
         $this->factory = $factory;
     }
 
-    /**
-     * @param Request $request
-     * @param Closure $next
-     * @return Response
-     */
     public function handle(Request $request, Closure $next) : Response
     {
 
@@ -48,11 +33,7 @@ class TransitionMiddleware
         return $this->transformResponse($request, $next($request));
     }
 
-    /**
-     * @param Request $request
-     * @return Request
-     */
-    private function transformRequest(Request $request)
+    private function transformRequest(Request $request) : Request
     {
 
         foreach ($this->transitions($request->header($this->config->headerKey())) as $version) {
@@ -61,12 +42,7 @@ class TransitionMiddleware
         return $request;
     }
 
-    /**
-     * @param Request  $request
-     * @param Response $response
-     * @return Response
-     */
-    private function transformResponse(Request $request, Response $response)
+    private function transformResponse(Request $request, Response $response) : Response
     {
 
         foreach ($this->transitions($request->header($this->config->headerKey())) as $transition) {
@@ -77,12 +53,11 @@ class TransitionMiddleware
 
     /**
      * @param string|int $version
-     * @return iterable|Transition[]
+     * @return Generator|Transition[]
      */
-    private function transitions($version) : iterable
+    private function transitions($version) : Generator
     {
 
-        /** @var Transition $transition */
         foreach ($this->config->transitionsForVersion($version) as $transition) {
             yield $this->factory->create($transition);
         }

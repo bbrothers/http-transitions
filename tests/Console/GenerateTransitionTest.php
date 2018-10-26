@@ -11,7 +11,7 @@ class GenerateTransitionTest extends TestCase
     /** @var  Filesystem */
     protected $files;
 
-    public function setUp()
+    public function setUp() : void
     {
 
         parent::setUp();
@@ -20,7 +20,7 @@ class GenerateTransitionTest extends TestCase
     }
 
     /** @test */
-    public function itGeneratesATransitionClass()
+    public function itGeneratesATransitionClass() : void
     {
 
         $path = app_path('Http/Transitions/TestTransition.php');
@@ -34,7 +34,7 @@ class GenerateTransitionTest extends TestCase
     }
 
     /** @test */
-    public function itGeneratesARequestOnlyTransitionClass()
+    public function itGeneratesARequestOnlyTransitionClass() : void
     {
 
         $path = app_path('Http/Transitions/TestRequestTransition.php');
@@ -46,7 +46,7 @@ class GenerateTransitionTest extends TestCase
     }
 
     /** @test */
-    public function itGeneratesAResponseOnlyTransitionClass()
+    public function itGeneratesAResponseOnlyTransitionClass() : void
     {
 
         $path = app_path('Http/Transitions/TestResponseTransition.php');
@@ -57,9 +57,7 @@ class GenerateTransitionTest extends TestCase
         $this->assertNotContains('public function transformRequest', $contents);
     }
 
-
-
-    public function tearDown()
+    public function tearDown() : void
     {
         $this->files->cleanDirectory(app_path('Http/Transitions'));
     }
