@@ -1,13 +1,14 @@
 {
     "name" : "bbrothers/http-transitions",
-    "description" : "HTTP Schema Version Transitioning",
+    "description" : "API versioning with transition stages (migrations) based on a request header.",
     "keywords" : [
         "api",
         "http",
         "versioning",
         "transition",
         "schema",
-        "middleware"
+        "middleware",
+        "migrations"
     ],
     "homepage" : "https://github.com/bbrothers/http-transitions",
     "license" : "MIT",
