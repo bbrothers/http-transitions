@@ -125,6 +125,16 @@ class LaravelTransitionFactoryTest extends \PHPUnit\Framework\TestCase
             {
                 //
             }
+
+            public function addContextualBinding($concrete, $abstract, $implementation)
+            {
+                //
+            }
+
+            public function flush()
+            {
+                //
+            }
         };
     }
 }
