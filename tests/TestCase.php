@@ -1,36 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Transitions;
 
-use Illuminate\Contracts\Http\Kernel;
+use Illuminate\Contracts\Config\Repository;
 use Orchestra\Testbench\TestCase as Orchestra;
 
 abstract class TestCase extends Orchestra
 {
-
-    public function setUp(): void
+    protected function getPackageProviders($app): array
     {
-
-        parent::setUp();
-        $this->setupConfig();
-        $this->setUpRoutes();
-        $this->setUpMiddleware();
-    }
-
-    /**
-     * @param \Illuminate\Foundation\Application $app
-     * @return array
-     */
-    protected function getPackageProviders($app) : array
-    {
-
         return [TransitionProvider::class];
     }
 
-    protected function setupConfig() : void
+    protected function defineEnvironment($app): void
     {
-
-        $this->app['config']->set('transitions', [
+        $app->make(Repository::class)->set('transitions', [
             'headerKey' => 'Api-Version',
             'transitions' => [
                 '20160101' => [
@@ -45,27 +31,15 @@ abstract class TestCase extends Orchestra
         ]);
     }
 
-    protected function setUpRoutes() : void
+    protected function defineRoutes($router): void
     {
-
-        $this->app['router']->get('users/{id}', function ($id) {
-
-            return [
-                'id' => $id,
-                'name' => [
-                    'first_name' => 'John',
-                    'last_name' => 'Doe',
-                ],
-                'age' => 40,
-            ];
-        });
-
-        $this->app['router']->getRoutes()->refreshNameLookups();
-    }
-
-    protected function setUpMiddleware() : void
-    {
-
-        $this->app[Kernel::class]->pushMiddleware(TransitionMiddleware::class);
+        $router->get('users/{id}', fn (string $id) => [
+            'id' => (int) $id,
+            'name' => [
+                'first_name' => 'John',
+                'last_name' => 'Doe',
+            ],
+            'age' => 40,
+        ])->middleware(TransitionMiddleware::class);
     }
 }

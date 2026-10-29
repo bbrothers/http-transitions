@@ -1,20 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Transitions\Transitions;
 
 use DateTime;
-use Symfony\Component\HttpFoundation\Response;
-use Transitions\Transition;
 
-class BirthDateTransition extends Transition
+class BirthDateTransition extends JsonResponseTransition
 {
-
-    public function transformResponse(Response $response) : Response
+    protected function transformJson(array $content): array
     {
-        $content = json_decode($response->getContent(), true);
-        $content['birth_date'] = (new DateTime("-{$content['age']} years"))->format('Y-m-d');
+        ['age' => $age] = $content;
+
+        if (! is_int($age)) {
+            return $content;
+        }
+
+        $content['birth_date'] = (new DateTime("-{$age} years"))->format('Y-m-d');
         unset($content['age']);
 
-        return $response->setContent(json_encode($content));
+        return $content;
     }
 }

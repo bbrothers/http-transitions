@@ -1,18 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Transitions\Transitions;
 
-use Symfony\Component\HttpFoundation\Response;
-use Transitions\Transition;
-
-class NameToFirstNameLastNameTransition extends Transition
+class NameToFirstNameLastNameTransition extends JsonResponseTransition
 {
-
-    public function transformResponse(Response $response) : Response
+    protected function transformJson(array $content): array
     {
-        $content = json_decode($response->getContent(), true);
-        $content = array_diff_key(array_merge($content, $content['name']), ['name' => true]);
+        ['name' => $name] = $content;
 
-        return $response->setContent(json_encode($content));
+        if (! is_array($name)) {
+            return $content;
+        }
+
+        return array_diff_key([...$content, ...$name], ['name' => true]);
     }
 }

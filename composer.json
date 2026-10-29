@@ -13,17 +13,20 @@
     "homepage" : "https://github.com/bbrothers/http-transitions",
     "license" : "MIT",
     "require" : {
-        "php" : "^7.1",
+        "php" : "^8.3",
         "ext-json": "*",
-        "illuminate/config" : "5.5.*|5.6.*|5.7.*|5.8.*",
-        "illuminate/contracts" : "5.5.*|5.6.*|5.7.*|5.8.*",
-        "illuminate/http" : "5.5.*|5.6.*|5.7.*|5.8.*",
-        "illuminate/support" : "5.5.*|5.6.*|5.7.*|5.8.*"
+        "illuminate/config" : "^11.0|^12.0|^13.0",
+        "illuminate/console" : "^11.0|^12.0|^13.0",
+        "illuminate/contracts" : "^11.0|^12.0|^13.0",
+        "illuminate/http" : "^11.0|^12.0|^13.0",
+        "illuminate/support" : "^11.0|^12.0|^13.0"
     },
     "require-dev" : {
-        "phpunit/phpunit" : "^7.0",
-        "orchestra/testbench" : "~3.7",
-        "squizlabs/php_codesniffer": "^2.3"
+        "laravel/pint": "^1.18",
+        "orchestra/testbench": "^9.0|^10.0|^11.0",
+        "phpstan/phpstan": "^2.1",
+        "phpstan/phpstan-phpunit": "^2.0",
+        "phpunit/phpunit": "^11.5|^12.0|^13.0"
     },
     "autoload" : {
         "psr-4" : {
@@ -37,8 +40,8 @@
     },
     "scripts" : {
         "test" : "vendor/bin/phpunit",
-        "check-style" : "phpcs -p --standard=PSR2 --runtime-set ignore_errors_on_exit 1 --runtime-set ignore_warnings_on_exit 1 src tests",
-        "fix-style" : "phpcbf -p --standard=PSR2 --runtime-set ignore_errors_on_exit 1 --runtime-set ignore_warnings_on_exit 1 src tests"
+        "format" : "vendor/bin/pint",
+        "analyse" : "vendor/bin/phpstan analyse"
     },
     "config" : {
         "sort-packages" : true

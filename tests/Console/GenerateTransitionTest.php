@@ -1,64 +1,68 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Transitions\Console;
 
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Facades\Artisan;
+use PHPUnit\Framework\Attributes\Test;
 use Transitions\TestCase;
 
-class GenerateTransitionTest extends TestCase
+final class GenerateTransitionTest extends TestCase
 {
+    private Filesystem $files;
 
-    /** @var  Filesystem */
-    protected $files;
-
-    public function setUp() : void
+    protected function setUp(): void
     {
-
         parent::setUp();
-        $this->files = $this->app->make(Filesystem::class);
-        $this->withoutMockingConsoleOutput();
+
+        $this->files = new Filesystem;
     }
 
-    /** @test */
-    public function itGeneratesATransitionClass() : void
+    protected function tearDown(): void
     {
+        $this->files->deleteDirectory(app_path('Http/Transitions'));
 
-        $path = app_path('Http/Transitions/TestTransition.php');
-        $this->artisan('make:transition', ['name' => 'TestTransition']);
-        $this->assertFileExists($path);
-        $contents = $this->files->get($path);
-        $this->assertContains('namespace App\Http\Transitions;', $contents);
-        $this->assertContains('class TestTransition extends Transition', $contents);
-        $this->assertContains('public function transformRequest', $contents);
-        $this->assertContains('public function transformResponse', $contents);
+        parent::tearDown();
     }
 
-    /** @test */
-    public function itGeneratesARequestOnlyTransitionClass() : void
+    #[Test]
+    public function it_generates_a_transition_class(): void
     {
+        $contents = $this->generate('TestTransition');
 
-        $path = app_path('Http/Transitions/TestRequestTransition.php');
-        $this->artisan('make:transition', ['name' => 'TestRequestTransition', '--request-only' => true]);
-        $this->assertFileExists($path);
-        $contents = $this->files->get($path);
-        $this->assertContains('public function transformRequest', $contents);
-        $this->assertNotContains('public function transformResponse', $contents);
+        $this->assertStringContainsString('namespace App\Http\Transitions;', $contents);
+        $this->assertStringContainsString('class TestTransition extends Transition', $contents);
+        $this->assertStringContainsString('public function transformRequest', $contents);
+        $this->assertStringContainsString('public function transformResponse', $contents);
     }
 
-    /** @test */
-    public function itGeneratesAResponseOnlyTransitionClass() : void
+    #[Test]
+    public function it_generates_a_request_only_transition_class(): void
     {
+        $contents = $this->generate('TestRequestTransition', ['--request-only' => true]);
 
-        $path = app_path('Http/Transitions/TestResponseTransition.php');
-        $this->artisan('make:transition', ['name' => 'TestResponseTransition', '--response-only' => true]);
-        $this->assertFileExists($path);
-        $contents = $this->files->get($path);
-        $this->assertContains('public function transformResponse', $contents);
-        $this->assertNotContains('public function transformRequest', $contents);
+        $this->assertStringContainsString('public function transformRequest', $contents);
+        $this->assertStringNotContainsString('public function transformResponse', $contents);
     }
 
-    public function tearDown() : void
+    #[Test]
+    public function it_generates_a_response_only_transition_class(): void
     {
-        $this->files->cleanDirectory(app_path('Http/Transitions'));
+        $contents = $this->generate('TestResponseTransition', ['--response-only' => true]);
+
+        $this->assertStringContainsString('public function transformResponse', $contents);
+        $this->assertStringNotContainsString('public function transformRequest', $contents);
+    }
+
+    /**
+     * @param  array<string, bool>  $options
+     */
+    private function generate(string $name, array $options = []): string
+    {
+        $this->assertSame(0, Artisan::call('make:transition', ['name' => $name, ...$options]));
+
+        return $this->files->get(app_path("Http/Transitions/{$name}.php"));
     }
 }

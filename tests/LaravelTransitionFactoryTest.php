@@ -1,140 +1,32 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Transitions;
 
-use Closure;
-use Illuminate\Contracts\Container\Container;
+use Illuminate\Container\Container;
+use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\TestCase;
 use Transitions\Transitions\BirthDateTransition;
 
-class LaravelTransitionFactoryTest extends \PHPUnit\Framework\TestCase
+final class LaravelTransitionFactoryTest extends TestCase
 {
-
-    /** @test */
-    public function itCanInstantiateATransition() : void
+    #[Test]
+    public function it_can_instantiate_a_transition(): void
     {
+        $factory = new LaravelTransitionFactory(new Container);
 
-        $factory = new LaravelTransitionFactory($this->fakedContainer());
-        $transition = $factory->create(BirthDateTransition::class);
-        $this->assertInstanceOf(Transition::class, $transition);
+        $this->assertInstanceOf(BirthDateTransition::class, $factory->create(BirthDateTransition::class));
     }
 
-    /** @test */
-    public function itWillReturnTheSameTransitionInstanceOnSubsequentCalls() : void
+    #[Test]
+    public function it_returns_the_same_transition_instance_on_subsequent_calls(): void
     {
+        $factory = new LaravelTransitionFactory(new Container);
 
-        $factory = new LaravelTransitionFactory($this->fakedContainer());
         $this->assertSame(
             $factory->create(BirthDateTransition::class),
-            $factory->create(BirthDateTransition::class)
+            $factory->create(BirthDateTransition::class),
         );
-    }
-
-    private function fakedContainer() : Container
-    {
-
-        return new class implements Container
-        {
-
-            public function make($abstract, array $parameters = [])
-            {
-
-                return new $abstract;
-            }
-
-            public function bound($abstract)
-            {
-                //
-            }
-
-            public function alias($abstract, $alias)
-            {
-                //
-            }
-
-            public function tag($abstracts, $tags)
-            {
-                //
-            }
-
-            public function tagged($tag)
-            {
-                //
-            }
-
-            public function bind($abstract, $concrete = null, $shared = false)
-            {
-                //
-            }
-
-            public function bindIf($abstract, $concrete = null, $shared = false)
-            {
-                //
-            }
-
-            public function singleton($abstract, $concrete = null)
-            {
-                //
-            }
-
-            public function extend($abstract, Closure $closure)
-            {
-                //
-            }
-
-            public function instance($abstract, $instance)
-            {
-                //
-            }
-
-            public function when($concrete)
-            {
-                //
-            }
-
-            public function factory($abstract)
-            {
-                //
-            }
-
-            public function call($callback, array $parameters = [], $defaultMethod = null)
-            {
-                //
-            }
-
-            public function resolved($abstract)
-            {
-                //
-            }
-
-            public function resolving($abstract, Closure $callback = null)
-            {
-                //
-            }
-
-            public function afterResolving($abstract, Closure $callback = null)
-            {
-                //
-            }
-
-            public function get($id)
-            {
-                //
-            }
-
-            public function has($id)
-            {
-                //
-            }
-
-            public function addContextualBinding($concrete, $abstract, $implementation)
-            {
-                //
-            }
-
-            public function flush()
-            {
-                //
-            }
-        };
     }
 }

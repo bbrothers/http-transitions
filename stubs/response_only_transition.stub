@@ -1,16 +1,14 @@
 <?php
 
-namespace DummyNamespace;
+namespace {{ namespace }};
 
 use Symfony\Component\HttpFoundation\Response;
 use Transitions\Transition;
 
-class DummyClass extends Transition
+class {{ class }} extends Transition
 {
-
-    public function transformResponse(Response $response) : Response
+    public function transformResponse(Response $response): Response
     {
-
         return $response;
     }
 }

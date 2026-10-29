@@ -1,34 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Transitions;
 
 use Illuminate\Contracts\Container\Container;
 
-class LaravelTransitionFactory implements TransitionFactory
+final class LaravelTransitionFactory implements TransitionFactory
 {
+    /** @var array<class-string<Transition>, Transition> */
+    private array $transitions = [];
 
-    /**
-     * @var array
-     */
-    private static $transitions = [];
+    public function __construct(private readonly Container $container) {}
 
-    /**
-     * @var Container
-     */
-    private $container;
-
-    public function __construct(Container $container)
+    public function create(string $transition): Transition
     {
-
-        $this->container = $container;
-    }
-
-    public function create(string $transition) : Transition
-    {
-
-        if (! isset(self::$transitions[$transition])) {
-            self::$transitions[$transition] = $this->container->make($transition);
-        }
-        return self::$transitions[$transition];
+        return $this->transitions[$transition] ??= $this->container->make($transition);
     }
 }

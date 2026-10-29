@@ -1,84 +1,46 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Transitions;
 
-class Config
+final readonly class Config
 {
-
-    /**
-     * The header key for the applicable transition version.
-     * @var string
-     */
-    protected $headerKey;
-
-    /**
-     * An array of transitions to apply, keyed by version date.
-     * @var array
-     */
-    protected $transitions;
-
-    public function __construct(string $headerKey = '', array $transitions = [])
-    {
-
-        $this->setHeaderKey($headerKey)
-             ->setTransitions($transitions);
-    }
-
-    public static function fromArray(array $attributes) : Config
-    {
-
-        return new static($attributes['headerKey'] ?? '', $attributes['transitions'] ?? []);
-    }
-
-    public function headerKey() : string
-    {
-
-        return $this->headerKey;
-    }
-
-    /**
-     * Get the applicable transitions for the given version.
-     *
-     * @param string|int $version
-     * @return array|Transition[]
-     */
-    public function transitionsForVersion($version) : array
-    {
-
-        return array_reduce($this->filterStages($version), function (array $applicable, array $classes) {
-
-            return array_merge($applicable, $classes);
-        }, []);
-    }
-
-    /**
-     * @param string|int $version
-     * @return array
-     */
-    private function filterStages($version) : array
-    {
-
-        return array_filter($this->transitions, function ($key) use ($version) {
-
-            return $version <= $key or $key === '*';
-        }, ARRAY_FILTER_USE_KEY);
-    }
-
-    public function setHeaderKey(string $headerKey = '') : Config
-    {
-
-        if (empty($headerKey)) {
-            throw HeaderKeyNotDefined::new();
+    /** @param  list<Stage>  $stages */
+    public function __construct(
+        public string $headerKey,
+        private array $stages = [],
+    ) {
+        if ($headerKey === '') {
+            throw InvalidConfiguration::missingHeaderKey();
         }
-        $this->headerKey = $headerKey;
-
-        return $this;
     }
 
-    public function setTransitions(array $transitions = []) : Config
+    /** @param  array<mixed>  $attributes */
+    public static function fromArray(array $attributes): self
     {
+        $headerKey = $attributes['headerKey'] ?? '';
+        $transitions = $attributes['transitions'] ?? [];
 
-        $this->transitions = $transitions;
-        return $this;
+        if (! is_string($headerKey)) {
+            throw InvalidConfiguration::missingHeaderKey();
+        }
+
+        if (! is_array($transitions)) {
+            throw InvalidConfiguration::transitionsMustBeKeyedByVersion();
+        }
+
+        return new self(
+            $headerKey,
+            array_map(Stage::fromConfig(...), array_keys($transitions), $transitions),
+        );
+    }
+
+    /** @return list<class-string<Transition>> */
+    public function transitionsFor(?Version $requested): array
+    {
+        $applicable = array_filter($this->stages, fn (Stage $stage): bool => $stage->appliesTo($requested));
+
+        return array_merge(...array_map(fn (Stage $stage): array => $stage->transitions, array_values($applicable)));
     }
 }

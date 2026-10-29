@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Transitions;
 
 use Closure;
@@ -7,58 +9,35 @@ use Generator;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class TransitionMiddleware
+final readonly class TransitionMiddleware
 {
+    public function __construct(
+        private Config $config,
+        private TransitionFactory $factory,
+    ) {}
 
-    /**
-     * @var Config
-     */
-    private $config;
-    /**
-     * @var TransitionFactory
-     */
-    private $factory;
-
-    public function __construct(Config $config, TransitionFactory $factory)
+    /** @param  Closure(Request): Response  $next */
+    public function handle(Request $request, Closure $next): Response
     {
-
-        $this->config = $config;
-        $this->factory = $factory;
-    }
-
-    public function handle(Request $request, Closure $next) : Response
-    {
-
-        $request = $this->transformRequest($request);
-        return $this->transformResponse($request, $next($request));
-    }
-
-    private function transformRequest(Request $request) : Request
-    {
-
-        foreach ($this->transitions($request->header($this->config->headerKey())) as $version) {
-            $request = $version->transformRequest($request);
+        foreach ($this->transitionsFor($request) as $transition) {
+            $request = $transition->transformRequest($request);
         }
-        return $request;
-    }
 
-    private function transformResponse(Request $request, Response $response) : Response
-    {
+        $response = $next($request);
 
-        foreach ($this->transitions($request->header($this->config->headerKey())) as $transition) {
+        foreach ($this->transitionsFor($request) as $transition) {
             $response = $transition->withRequest($request)->transformResponse($response);
         }
+
         return $response;
     }
 
-    /**
-     * @param string|int $version
-     * @return Generator|Transition[]
-     */
-    private function transitions($version) : Generator
+    /** @return Generator<Transition> */
+    private function transitionsFor(Request $request): Generator
     {
+        $version = Version::fromHeader($request->headers->get($this->config->headerKey));
 
-        foreach ($this->config->transitionsForVersion($version) as $transition) {
+        foreach ($this->config->transitionsFor($version) as $transition) {
             yield $this->factory->create($transition);
         }
     }

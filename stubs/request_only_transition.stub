@@ -1,16 +1,14 @@
 <?php
 
-namespace DummyNamespace;
+namespace {{ namespace }};
 
 use Illuminate\Http\Request;
 use Transitions\Transition;
 
-class DummyClass extends Transition
+class {{ class }} extends Transition
 {
-
-    public function transformRequest(Request $request) : Request
+    public function transformRequest(Request $request): Request
     {
-
         return $request;
     }
 }

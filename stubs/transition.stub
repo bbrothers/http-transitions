@@ -1,23 +1,20 @@
 <?php
 
-namespace DummyNamespace;
+namespace {{ namespace }};
 
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Transitions\Transition;
 
-class DummyClass extends Transition
+class {{ class }} extends Transition
 {
-
-    public function transformRequest(Request $request) : Request
+    public function transformRequest(Request $request): Request
     {
-
         return $request;
     }
 
-    public function transformResponse(Response $response) : Response
+    public function transformResponse(Response $response): Response
     {
-
         return $response;
     }
 }

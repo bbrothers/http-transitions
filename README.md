@@ -2,9 +2,7 @@
 
 [![Latest Version on Packagist][ico-version]][link-packagist]
 [![Software License][ico-license]](LICENSE.md)
-[![Build Status][ico-travis]][link-travis]
-[![Coverage Status][ico-scrutinizer]][link-scrutinizer]
-[![Quality Score][ico-code-quality]][link-code-quality]
+[![Tests][ico-tests]][link-tests]
 [![Total Downloads][ico-downloads]][link-downloads]
 
 A package for transitioning HTTP requests and responses based on a version header.  
@@ -13,30 +11,32 @@ Release updates to your API schema without breaking existing clients by creating
 
 Largely based on [Stripe's API versioning](https://stripe.com/blog/api-versioning) article.
 
+## Requirements
+
+- PHP 8.3+
+- Laravel 11, 12 or 13
+
 ## Install
 
 ``` bash
 $ composer require bbrothers/http-transitions
 ```
+The service provider is auto-discovered.
+
 #### Middleware
 
-In your `app/Http/Kernel.php` file, add:
+In `bootstrap/app.php`, add the middleware globally or to a group:
 ```php
-protected $middleware = [
-    Transitions\TransitionMiddleware::class
-];
-```
-
-#### Service Provider
-
-For Laravel 5.4, in your `config/app.php` file, in the `providers` array, add:
-```php
-Transitions\TransitionProvider::class
+->withMiddleware(function (Middleware $middleware) {
+    $middleware->api(append: [
+        Transitions\TransitionMiddleware::class,
+    ]);
+})
 ```
 
 #### Publish Config
 ```bash
-php artisan vendor:publish --provider="Transitions\TransitionProvider"
+php artisan vendor:publish --tag=transitions-config
 ```
 
 ## Usage
@@ -61,8 +61,7 @@ Create a transition:
 ```php
 class NameToFirstNameLastNameTransition extends Transition
 {
-
-    public function transformResponse(Response $response) : Response
+    public function transformResponse(Response $response): Response
     {
         $content = json_decode($response->getContent(), true);
         $content = array_diff_key(array_merge($content, $content['name']), ['name' => true]);
@@ -88,15 +87,11 @@ The MIT License (MIT). Please see [License File](LICENSE.md) for more informatio
 
 [ico-version]: https://img.shields.io/packagist/v/bbrothers/http-transitions.svg?style=flat-square
 [ico-license]: https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square
-[ico-travis]: https://img.shields.io/travis/bbrothers/http-transitions/master.svg?style=flat-square
-[ico-scrutinizer]: https://img.shields.io/scrutinizer/coverage/g/bbrothers/http-transitions.svg?style=flat-square
-[ico-code-quality]: https://img.shields.io/scrutinizer/g/bbrothers/http-transitions.svg?style=flat-square
+[ico-tests]: https://img.shields.io/github/actions/workflow/status/bbrothers/http-transitions/tests.yml?branch=master&style=flat-square
 [ico-downloads]: https://img.shields.io/packagist/dt/bbrothers/http-transitions.svg?style=flat-square
 
 [link-packagist]: https://packagist.org/packages/bbrothers/http-transitions
-[link-travis]: https://travis-ci.org/bbrothers/http-transitions
-[link-scrutinizer]: https://scrutinizer-ci.com/g/bbrothers/http-transitions/code-structure
-[link-code-quality]: https://scrutinizer-ci.com/g/bbrothers/http-transitions
+[link-tests]: https://github.com/bbrothers/http-transitions/actions/workflows/tests.yml
 [link-downloads]: https://packagist.org/packages/bbrothers/http-transitions
 [link-author]: https://github.com/bbrothers
 [link-contributors]: ../../contributors

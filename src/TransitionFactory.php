@@ -1,9 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Transitions;
 
 interface TransitionFactory
 {
-
-    public function create(string $transition) : Transition;
+    /** @param  class-string<Transition>  $transition */
+    public function create(string $transition): Transition;
 }
