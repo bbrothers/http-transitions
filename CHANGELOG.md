@@ -4,6 +4,11 @@ All Notable changes to `http-transitions` will be documented in this file.
 
 Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) principles.
 
+## [v1.0.1] - 2026-10-29
+
+### Removed
+- Laravel 11 support. Every Laravel 11 release is affected by unpatched security advisories (including CVE-2026-114509), so Composer 2.9+ refuses to install it
+
 ## [v1.0.0] - 2026-10-29
 
 ### Changed
