@@ -4,7 +4,7 @@ All Notable changes to `http-transitions` will be documented in this file.
 
 Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) principles.
 
-## [v1.0.0] - Unreleased
+## [v1.0.0] - 2026-10-29
 
 ### Changed
 - Requires PHP 8.3+ and Laravel 11, 12 or 13
