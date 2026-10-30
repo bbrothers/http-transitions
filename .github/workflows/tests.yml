@@ -14,7 +14,7 @@ jobs:
     name: PHP ${{ matrix.php }} / Laravel ${{ matrix.laravel }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: shivammathur/setup-php@v2
         with:
@@ -23,6 +23,7 @@ jobs:
 
       - run: composer require "illuminate/support:${{ matrix.laravel }}" --no-interaction --no-update
       - run: composer update --prefer-dist --no-interaction
+      - run: composer audit
       - run: vendor/bin/pint --test
       - run: vendor/bin/phpstan analyse --no-progress
       - run: vendor/bin/phpunit

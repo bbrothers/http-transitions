@@ -4,6 +4,11 @@ All Notable changes to `http-transitions` will be documented in this file.
 
 Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) principles.
 
+## [Unreleased]
+
+### Changed
+- Requires Laravel 12.69+ or 13.30+, the first releases patched against CVE-2026-114509, CVE-2026-114508 and CVE-2026-102279
+
 ## [v1.0.1] - 2026-10-29
 
 ### Removed
