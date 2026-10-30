@@ -8,6 +8,7 @@ use DateTime;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Testing\TestResponse;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Response;
@@ -92,6 +93,78 @@ final class TransitionMiddlewareTest extends TestCase
         });
 
         TestResponse::fromBaseResponse($response)->assertExactJson($this->stubbedUser());
+    }
+
+    #[Test]
+    public function it_marks_the_response_as_varying_by_the_version_header_so_shared_caches_key_on_it(): void
+    {
+        $request = new Request;
+        $request->headers->set('Api-Version', '20150101');
+
+        $this->assertSame(['Api-Version'], $this->handle($request)->baseResponse->getVary());
+    }
+
+    #[Test]
+    public function it_keeps_existing_vary_headers(): void
+    {
+        $middleware = new TransitionMiddleware($this->stubbedConfig(), $this->factory());
+
+        $response = $middleware->handle(new Request, fn () => new JsonResponse($this->stubbedUser(), headers: ['Vary' => 'Accept-Encoding']));
+
+        $this->assertSame(['Accept-Encoding', 'Api-Version'], $response->getVary());
+    }
+
+    /** @return iterable<string, array{string}> */
+    public static function varyHeadersAlreadyCoveringTheVersion(): iterable
+    {
+        yield 'wildcard' => ['*'];
+        yield 'same name' => ['Api-Version'];
+        yield 'different case' => ['api-version'];
+    }
+
+    #[Test]
+    #[DataProvider('varyHeadersAlreadyCoveringTheVersion')]
+    public function it_leaves_a_vary_header_that_already_covers_the_version_untouched(string $vary): void
+    {
+        $middleware = new TransitionMiddleware($this->stubbedConfig(), $this->factory());
+
+        $response = $middleware->handle(new Request, fn () => new JsonResponse($this->stubbedUser(), headers: ['Vary' => $vary]));
+
+        $this->assertSame([$vary], $response->getVary());
+    }
+
+    /** @return iterable<string, array{string}> */
+    public static function hostileVersionHeaders(): iterable
+    {
+        yield 'markup' => ['<script>alert(1)</script>'];
+        yield 'sql' => ["' OR 1=1--"];
+        yield 'null byte' => ["20170101\0"];
+        yield 'header injection' => ["20170101\r\nSet-Cookie: session=stolen"];
+        yield 'class name' => [Transitions\BirthDateTransition::class];
+        yield 'oversized' => [str_repeat('9', 1_000_000)];
+    }
+
+    #[Test]
+    #[DataProvider('hostileVersionHeaders')]
+    public function it_treats_a_hostile_version_header_as_an_opaque_version_that_is_never_reflected(string $header): void
+    {
+        $request = new Request;
+        $request->headers->set('Api-Version', $header);
+
+        $response = $this->handle($request);
+
+        $response->assertOk();
+        $response->assertHeaderMissing('Set-Cookie');
+        $this->assertStringNotContainsString($header, serialize($response->json()));
+        $this->assertStringNotContainsString($header, (string) $response->headers);
+    }
+
+    #[Test]
+    public function it_uses_the_first_value_when_the_version_header_is_repeated(): void
+    {
+        $request = Request::create('/', server: ['HTTP_API_VERSION' => '20150101, 20170101']);
+
+        $this->handle($request)->assertJson($this->transitionedUser());
     }
 
     /** @return TestResponse<Response> */

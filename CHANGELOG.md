@@ -6,7 +6,11 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ## [Unreleased]
 
+### Security
+- Responses now carry `Vary: <headerKey>`, so shared caches and CDNs no longer serve one version's response to clients requesting another (cache poisoning)
+
 ### Changed
+- A repeated version header (sent as `20150101, 20170101`) now resolves to its first value, and surrounding whitespace is ignored. Previously the whole string was compared as one version, selecting a set of transitions matching no configured version
 - Requires Laravel 12.69+ or 13.30+, the first releases patched against CVE-2026-114509, CVE-2026-114508 and CVE-2026-102279
 
 ## [v1.0.1] - 2026-10-29

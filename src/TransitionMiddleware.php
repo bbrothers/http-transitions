@@ -29,7 +29,18 @@ final readonly class TransitionMiddleware
             $response = $transition->withRequest($request)->transformResponse($response);
         }
 
+        if (! $this->variesByVersion($response)) {
+            $response->setVary($this->config->headerKey, replace: false);
+        }
+
         return $response;
+    }
+
+    private function variesByVersion(Response $response): bool
+    {
+        $vary = array_map(strtolower(...), array_filter($response->getVary(), is_string(...)));
+
+        return in_array('*', $vary, true) || in_array(strtolower($this->config->headerKey), $vary, true);
     }
 
     /** @return Generator<Transition> */

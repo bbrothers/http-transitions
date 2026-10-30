@@ -15,7 +15,9 @@ final readonly class Version
 
     public static function fromHeader(?string $header): ?self
     {
-        return $header === null || $header === '' ? null : new self($header);
+        $first = preg_split('/\s*,\s*/', trim($header ?? ''), 2)[0] ?? '';
+
+        return $first === '' ? null : new self($first);
     }
 
     public function isAtOrBefore(self $other): bool

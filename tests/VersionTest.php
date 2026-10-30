@@ -33,5 +33,23 @@ final class VersionTest extends TestCase
     {
         $this->assertNull(Version::fromHeader(null));
         $this->assertNull(Version::fromHeader(''));
+        $this->assertNull(Version::fromHeader('  '));
+        $this->assertNull(Version::fromHeader(', 20160101'));
+    }
+
+    /** @return iterable<string, array{string}> */
+    public static function headersNamingTheSameVersion(): iterable
+    {
+        yield 'single value' => ['20160101'];
+        yield 'surrounding whitespace' => [" \t20160101 "];
+        yield 'repeated header' => ['20160101,20170101'];
+        yield 'repeated header with whitespace' => ["20160101 ,\t20170101"];
+    }
+
+    #[Test]
+    #[DataProvider('headersNamingTheSameVersion')]
+    public function it_takes_the_first_comma_separated_value_ignoring_whitespace(string $header): void
+    {
+        $this->assertSame('20160101', Version::fromHeader($header)?->value);
     }
 }
